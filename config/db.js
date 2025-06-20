@@ -7,16 +7,6 @@ const DB_NAME = process.env.DB_NAME;
 
 
 let uri = process.env.MONGODB_URI;
-if (uri && !uri.endsWith('/demo-db-2')) {
-  // Ensure the URI ends with the database name
-  if (uri.endsWith('/')) {
-    uri = uri + 'demo-db-2';
-  } else {
-    uri = uri + '/demo-db-2';
-  }
-}
-console.log("uri-=-=-=-=?", uri)
-
 
 const connect = async () => {
   try {
