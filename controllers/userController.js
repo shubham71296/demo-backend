@@ -69,24 +69,25 @@ exports.forgotPassword = async (req, res) => {
     await user.save();
     
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
+      service: 'gmail',
       auth: {
-        user: process.env.USER_EMAIL,
-        pass: process.env.USER_PASSWORD
+        user: process.env.EMAIL_USER,
+        pass: process.env.PASSWORD_USER
       }
     });
-    const resetLink = `http://localhost:5000/api/users/reset-password/${token}`;
+    // const resetLink = `https://demo-backend-v5of.onrender.com/api/users/reset-password/${token}`;
+    const resetLink = `http://localhost:5173/reset-password/${token}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: user.email,
       subject: 'Password Reset',
       text: `You requested a password reset. Click the link to reset your password: ${resetLink}`,
-      html: `<p>You requested a password reset.</p><p>Click the link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
+      html: `<p>You Requested a password reset.</p><p>Click the link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
     };
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: 'If that email is registered, a reset link has been sent.' });
   } catch (err) {
+    console.log("error",err)
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
@@ -114,3 +115,15 @@ exports.validateResetToken = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const myId = req.user.userId;
+    console.log("myid",myId)
+    const users = await User.find({ _id: { $ne: myId } }, '-password -resetPasswordToken -resetPasswordExpires');
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
